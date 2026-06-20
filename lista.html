@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Banco de Questões - História</title>
     <style>
         body {
@@ -9,40 +10,69 @@
             background-color: #121214;
             color: #ffffff;
             margin: 0;
-            padding: 40px 20px;
+            padding: 20px 12px; /* Margens menores para telas de celular */
             display: flex;
             flex-direction: column;
             align-items: center;
+            box-sizing: border-box;
         }
-        h1 { color: #ffc107; margin-bottom: 25px; }
+        h1 { 
+            color: #ffc107; 
+            margin-bottom: 20px; 
+            font-size: 22px; 
+            text-align: center; 
+            line-height: 1.3;
+        }
         .item-lista { 
             background: #1e1e24; 
             border: 1px solid #29292e; 
-            padding: 20px; 
-            border-radius: 8px; 
+            padding: 16px; 
+            border-radius: 10px; 
             margin-bottom: 15px; 
             width: 100%; 
             max-width: 600px; 
             box-sizing: border-box; 
         }
-        .p-lista { font-weight: bold; color: #007bff; font-size: 16px; margin-bottom: 10px; }
-        .r-lista { color: #e1e1e6; font-size: 15px; margin-bottom: 15px; line-height: 1.5; }
-        
-        /* Container de controles do áudio */
-        .controles-audio {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
+        .p-lista { 
+            font-weight: bold; 
+            color: #007bff; 
+            font-size: 15px; 
+            margin-bottom: 10px; 
+            line-height: 1.4;
         }
+        .r-lista { 
+            color: #e1e1e6; 
+            font-size: 14px; 
+            margin-bottom: 15px; 
+            line-height: 1.5; 
+            text-align: justify;
+        }
+        
+        /* Grid de botões adaptável para mobile */
+        .controles-audio {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2 botões por linha no celular */
+            gap: 8px;
+            margin-top: 12px;
+            width: 100%;
+        }
+        
         button {
-            padding: 8px 16px;
+            padding: 12px 10px; /* Área de clique maior para os dedos */
             font-size: 13px;
             font-weight: bold;
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: background 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            width: 100%;
         }
+        button:active { transform: scale(0.98); }
+        
         .btn-play { background: #007bff; color: #ffffff; }
         .btn-play:hover { background: #0056b3; }
         .btn-pause { background: #6c757d; color: #ffffff; }
@@ -51,11 +81,26 @@
         .btn-stop:hover { background: #bd2130; }
         .btn-repeat { background: #ffc107; color: #121214; }
         .btn-repeat:hover { background: #e0a800; }
+
+        /* Ajustes para telas maiores (tabletes e computadores) */
+        @media (min-width: 480px) {
+            body { padding: 40px 20px; }
+            h1 { font-size: 26px; }
+            .item-lista { padding: 20px; }
+            .p-lista { font-size: 16px; }
+            .r-lista { font-size: 15px; }
+            .controles-audio {
+                display: flex; /* Volta a ficar lado a lado no PC */
+                flex-direction: row;
+                gap: 10px;
+            }
+            button { width: auto; padding: 8px 16px; }
+        }
     </style>
 </head>
 <body>
 
-    <h1>📚 Todas as Perguntas, Respostas e Áudios</h1>
+    <h1>📚 Toutes les Questions, Réponses et Audios</h1>
     <div id="container-lista" style="width: 100%; display: flex; flex-direction: column; align-items: center;"></div>
 
     <script>
@@ -66,7 +111,7 @@
             { id: 3, pergunta: "Quels sont os moteurs des grandes découvertes?", resposta: "Besoins économiques, moteurs politiques/religieux et progrès techniques.", detalhe: "Inclui a busca por novas rotas para as Índias, expansão da fé cristã, caravelas, bússolas e portulanos." },
             { id: 4, pergunta: "Qu'est-ce que le traité des Tordesillas, et quelle en était la principale conséquence pour la repartition des territoires entre l'espagne et le Portugal?", resposta: "Un accord entre l'Espagne et le Portugal en 1494 qui partageait les nouvelles terres découvertes.", detalhe: "L'Espagne recevait les terres à l'ouest de la linha e o Portugal as terras a leste." },
             { id: 5, pergunta: "Quelles sont les principales differences entre les colonies espagnoles et portugaises au XVIe siecle en termes d'exploitation des territoires?", resposta: "Les Espagnols exploitaient surtout les ressources, tandis que les Portugais développaient principalement le commerce.", detalhe: "Espanhóis focavam em mineração/recursos; Portugueses em comércio e feitorias comerciais." },
-            { id: 6, pergunta: "Quelles sont les consequences des Grandes Découvertes?", resposta: "Création de colonies, enrichissement européen, commerce mondial, diffusion du christianisme e diversité des nouriturre.", detalhe: "Globalização de trocas comerciais, enriquecimento e novos alimentos na Europa." },
+            { id: 6, pergunta: "Quelles sont les consequences des Grandes Découvertes?", resposta: "Création de colonies, enrichment européen, commerce mondial, diffusion du christianisme e diversité des nouriturre.", detalhe: "Globalização de trocas comerciais, enriquecimento e novos alimentos na Europa." },
             { id: 7, pergunta: "Sur quels principes se fonde la philosophie humaniste?", resposta: "Une façon de penser qui met l'être humain au centre.", detalhe: "Les humanistes pensent qu'il faut apprendre, réfléchir et respecter les autres." },
             { id: 8, pergunta: "Quelles etaient les principales critiques de Martin Luther concernant la vente des indulgences, et comment ont-elles contribué à la Réforme?", resposta: "Le pardon de Dieu ne pouvait pas être acheté et le salut dependait uniquement de la foi.", detalhe: "Contestou a autoridade da Igreja Católica, iniciando a Reforma Protestante." },
             { id: 9, pergunta: "Quels sont os objectifs da Contre-Réforme catholique et du Concile de Trente à la moitié du XVIe siecle?", resposta: "Renforcer l'Église catholique, lutter contre le protestantisme et corriger certains abus.", detalhe: "O Concílio de Trente confirmou doutrinas, melhorou a formação de padres e reforçou a disciplina." },
@@ -81,7 +126,7 @@
 
         function obterAudio(id) {
             if (!audiosIniciados[id]) {
-                audiosIniciados[id] = new Audio(`${id}.mp3`);
+                audiosIniciados[id] = new Audio(`./${id}.mp3`); // Corrigido com ./ para melhor suporte no GitHub Pages
             }
             return audiosIniciados[id];
         }
@@ -94,7 +139,7 @@
             });
 
             const som = obterAudio(id);
-            som.play().catch(e => alert(`Arquivo de áudio '${id}.mp3' não foi encontrado na pasta.`));
+            som.play().catch(e => alert(`Arquivo de áudio '${id}.mp3' não foi encontrado na sua pasta do GitHub.`));
         }
 
         function pausarAudio(id) {
