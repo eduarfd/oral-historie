@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Révision Orale - Histoire</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121214;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+        }
+        h1 { color: #007bff; margin-bottom: 5px; font-size: 24px; text-align: center; }
+        .sub { color: #8d8d99; margin-bottom: 20px; font-size: 13px; text-align: center; line-height: 1.4; }
+        
+        .card {
+            background: #1e1e24;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            max-width: 600px;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #29292e;
+            margin-bottom: 15px;
+        }
+        
+        .pergunta-header { color: #9d9da6; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .texto-principal { font-size: 17px; font-weight: bold; line-height: 1.5; margin-bottom: 20px; }
+        .secao-resposta { border-top: 1px solid #29292e; padding-top: 15px; margin-top: 15px; }
+        .titulo-resposta { color: #28a745; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
+        .titulo-explicacao { color: #ffc107; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-top: 15px; margin-bottom: 5px; }
+        .texto-secundario { color: #c4c4cc; font-size: 14px; line-height: 1.6; text-align: justify; }
+        
+        /* Boutons adaptés pour le Mobile (Zone de clic plus grande) */
+        button {
+            padding: 14px 20px;
+            font-size: 15px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            margin: 8px 0;
+            width: 100%; /* Full width sur mobile par défaut */
+            box-sizing: border-box;
+        }
+        button:active { transform: scale(0.98); }
+        
+        .btn-blue { background: #007bff; color: white; }
+        .btn-blue:hover { background: #0056b3; }
+        
+        .btn-random { background: #ffc107; color: #121214; }
+        .btn-random:hover { background: #e0a800; }
+        
+        .btn-nav { background: #29292e; color: #ffffff; border: 1px solid #3e3e4a; }
+        .btn-nav:hover { background: #3e3e4a; }
+        
+        .btn-success { background: #28a745; color: white; }
+        .btn-success:hover { background: #218838; }
+        
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; }
+        
+        /* Flexbox adaptatif pour mobile / desktop */
+        .flex-botoes { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            width: 100%; 
+            margin-top: 20px;
+        }
+        
+        .escondido { display: none; }
+        .status-ativo { color: #28a745; font-weight: bold; margin-top: 10px; text-align: center; font-size: 14px; }
+        audio { width: 100%; margin-top: 15px; margin-bottom: 5px; }
+
+        /* Media Query pour tablettes et ordinateurs */
+        @media (min-width: 480px) {
+            body { padding: 40px 20px; }
+            h1 { font-size: 28px; }
+            .card { padding: 30px; }
+            .flex-botoes { flex-direction: row; justify-content: space-between; }
+            .flex-botoes button { width: 48%; }
+            button { width: auto; margin: 5px; }
+            .btn-container-topo { display: flex; gap: 10px; justify-content: center; width: 100%; max-width: 600px; }
+            .btn-container-topo button { flex: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Révision Orale - Histoire ⏳</h1>
+    <p class="sub">Entraînez-vous en mode automatique (toutes les 15 min) ou générez instantanément une question.</p>
+    
+    <div class="btn-container-topo" style="width: 100%; max-width: 600px;">
+        <button class="btn-random" onclick="genererQuestionManuelle()">Question Aléatoire 🎲</button>
+        <button class="btn-nav" onclick="window.open('lista.html', '_blank')">📖 Voir la liste complète</button>
+    </div>
+
+    <button id="btn-permitir" class="btn-blue" style="max-width: 600px; width: 100%;" onclick="inicializarSistema()">Activer le mode automatique (15 min)</button>
+    <div id="status-msg" class="status-ativo escondido">✓ Mode auto actif ! Notification toutes les 15 minutes.</div>
+
+    <div id="area-estudo" class="card escondido" style="margin-top: 15px;">
+        <div class="pergunta-header">Question Actuelle :</div>
+        <div id="pergunta-texto" class="texto-principal"></div>
+        
+        <button class="btn-blue" id="btn-ver" onclick="mostrarResposta()">Voir la Réponse 💡</button>
+        
+        <div id="area-resposta" class="escondido secao-resposta">
+            <div class="titulo-resposta">Réponse en Audio 🎧 :</div>
+            <audio id="player-audio" controls></audio>
+
+            <div class="titulo-resposta" style="margin-top: 20px;">Réponse Textuelle :</div>
+            <div id="resposta-texto" class="texto-principal" style="font-size: 16px; color: #ffffff; font-weight: normal;"></div>
+            
+            <div class="titulo-explicacao">Explication détaillée / Contexte :</div>
+            <div id="explicacao-texto" class="texto-secundario"></div>
+            
+            <div class="flex-botoes">
+                <button class="btn-success" onclick="computar(true)">J'ai réussi ✓</button>
+                <button class="btn-danger" onclick="computar(false)">J'ai échoué ✗</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const perguntasIniciais = [
+            { 
+                id: 1, 
+                pergunta: "En quoi consiste une carte T en O? En quelle période ces cartes sont-elles utilisées ? Quel est leur but ?", 
+                resposta: "Une représentation schématique du monde telle qu'elle était conçue au Moyen Âge.", 
+                explicacao: "Le 'O' représente le monde circulaire entouré par l'Océan mondial. Le 'T' représente les divisions intérieures de ce cercle à l'aide des cours d'eau majeurs et de la mer Méditerranée (la barre verticale symbolise la Méditerranée, la barre horizontale représente le Danube, le Nil ou le Don). Ces cartes, utilisées durant la période médiévale, n'avaient absolument pas pour but de servir d'outil de navigation, mais possédaient une fonction purement symbolique, théologique et religieuse, illustrant fidèlement la vision chrétienne du monde (Jérusalem étant souvent placée au centre géométrique exact du dessin)." 
+            },
+            { 
+                id: 2, 
+                pergunta: "Quels sont les deux événements qui marquent le début des temps Modernes?", 
+                resposta: "L'invention de l'imprimerie vers 1450 par Johannes Gutenberg et l'essor de l'Humanisme.", 
+                explicacao: "L'imprimerie à caractères mobiles métalliques révolutionne la diffusion des savoirs et des textes sacrés en Europe. Parallèlement, l'Humanisme s'établit comme une profonde révolution philosophique et intellectuelle. Cette philosophie se caractérise par une rupture majeure avec la pensée scolastique médiévale en plaçant l'Homme et sa capacité de raisonnement au centre de toutes les préoccupations de l'univers, plutôt que de s'appuyer uniquement sur une vision exclusivement théocentrique et religieuse." 
+            },
+            { 
+                id: 3, 
+                pergunta: "Quels sont les moteurs des grandes découvertes?", 
+                resposta: "Les besoins économiques, les moteurs politiques/religieux et les progrès techniques.", 
+                explicacao: "1. Besoins économiques : recherche urgente d'une nouvelle route commerciale vers les Indes afin de contourner le monopole ottoman suite à la chute de Constantinople (1453) et s'approvisionner en épices et métaux précieux.\n2. Moteurs politiques et religieux : le désir ardent des monarchies européennes d'étendre leur souveraineté territoriale, de rivaliser de puissance, et de défendre ainsi que de diffuser la foi chrétienne (évangélisation).\n3. Progrès techniques : innovations majeures facilitant la navigation hauturière, notamment l'invention de la caravelle (navire stable à voiles mixtes), l'amélioration d'instruments précis (la boussole, l'astrolabe pour la latitude) et le perfectionnement des portulans (cartes maritimes détaillant précisément les côtes et l'emplacement des ports)." 
+            },
+            { 
+                id: 4, 
+                pergunta: "Qu'est-ce que le traité de Tordesillas, et quelle en était la principale conséquence pour la répartition des territoires entre l'Espagne et le Portugal?", 
+                resposta: "Un accord diplomatique bilatéral signé en 1494 partageant les nouvelles terres découvertes.", 
+                explicacao: "Établi sous l'égide du pape, le traité trace une ligne imaginaire de démarcation (un méridien situé à 370 lieues à l'ouest des îles du Cap-Vert). La conséquence géopolitique majeure est la division stricte du monde non chrétien : la Couronne d'Espagne recevait le monopole exclusif de colonisation sur toutes les terres situées à l'ouest de cette ligne, tandis que le Royaume du Portugal obtenait la souveraineté sur les terres situées à l'est. C'est ce découpage qui permettra plus tard au Portugal de revendiquer et de coloniser légalement le Brésil." 
+            },
+            { 
+                id: 5, 
+                pergunta: "Quelles sont les principales différences entre les colonies espagnoles et portugaises au XVIe siècle en termes d'exploitation des territoires?", 
+                resposta: "Les Espagnols exploitaient massivement les ressources minières et agricoles internes, tandis que les Portugais développaient principalement un réseau commercial maritime basé sur des comptoirs.", 
+                explicacao: "L'Empire espagnol s'organise rapidement autour d'une colonisation de peuplement et d'exploitation continentale profonde des empires conquis (Aztèque, Inca), mettant en place le système de l'encomienda pour extraire les métaux précieux (mines d'or et d'argent de Potosí). À l'inverse, l'Empire portugais du XVIe siècle privilégie une stratégie maritime et commerciale plus périphérique : ils installent des 'feitorias' (comptoirs fortifiés) le long des côtes africaines et asiatiques pour sécuriser les routes maritimes et monopoliser le commerce des épices, de la soie et de l'ivoire sans nécessairement chercher à conquérir de vastes territoires intérieurs dans un premier temps." 
+            },
+            { 
+                id: 6, 
+                pergunta: "Quelles sont les conséquences des Grandes Découvertes?", 
+                resposta: "La création de vastes empires coloniaux, l'enrichissement de l'Europe, l'émergence d'un commerce mondial, la diffusion globale du christianisme et la diversité de la nourriture.", 
+                explicacao: "Les conséquences sont structurelles et durables :\n1. Politique et économique : Naissance des premiers empires coloniaux globaux et transfert massif d'or et d'argent vers l'Europe, déplaçant le cœur de l'économie européenne de la Méditerranée vers l'océan Atlantique.\n2. Commerciale : Mondialisation des échanges interconnectant l'Europe, l'Afrique, l'Asie et les Amériques (premières formes de capitalisme marchand et mise en place ultérieure du commerce triangulaire).\n3. Culturelle : Diffusion mondiale du christianisme par le biais des missionnaires.\n4. Biologique (Échange colombien) : Révolution des habitudes alimentaires européennes grâce à l'introduction de nouveaux produits agricoles de base jusqu'alors inconnus, tels que la pomme de terre, le maïs, la tomate, le haricot, le cacao et le tabac." 
+            },
+            { 
+                id: 7, 
+                pergunta: "Sur quels principes se fonde la philosophie humaniste?", 
+                resposta: "Un courant de pensée européen qui place l'être humain, sa raison et sa dignité au centre du monde.", 
+                explicacao: "L'Humanisme s'appuie sur plusieurs piliers fondamentaux : le retour rigoureux aux textes originaux de l'Antiquité gréco-romaine (philologie), une foi inébranlable dans le progrès humain, l'importance capitale accordée à l'éducation universelle pour développer le libre arbitre et l'esprit critique. Les humanistes considèrent que l'Homme est doué de raison et capable de s'épanouir, de penser par lui-même et de comprendre les lois de la nature tout en respectant autrui, rompant ainsi avec le fatalisme théologique du Moyen Âge." 
+            },
+            { 
+                id: 8, 
+                pergunta: "Quelles étaient les principales critiques de Martin Luther concernant la vente des indulgences, et comment ont-elles contribué à la Réforme?", 
+                resposta: "Luther affirmait que le pardon divin ne pouvait pas être acheté avec de l'argent et que le salut de l'âme dépendait uniquement de la foi sincère du croyant.", 
+                explicacao: "En 1517, Martin Luther affiche ses '95 Thèses' sur la porte de l'église de Wittemberg pour dénoncer fermement le commerce scandaleux des indulgences orchestré par la papauté pour financer la basilique Saint-Pierre. Il critique l'idée que l'Église puisse monnayer la rémission des péchés ou abréger le temps de séjour au Purgatoire. En affirmant que seule la grâce de Dieu accordée par la foi pure sauve le croyant (Le Salut par la foi seule) et que la Bible est l'unique autorité légitime, il ébranle l'autorité absolue du Pape, déclenchant ainsi la Réforme protestante." 
+            },
+            { 
+                id: 9, 
+                pergunta: "Quels sont les objectifs de la Contre-Réforme catholique et du Concile de Trente à la moitié du XVIe siècle?", 
+                resposta: "Renforcer l'Église catholique face à la montée du protestantisme, réaffirmer les dogmes traditionnels et corriger les abus internes.", 
+                explicacao: "Réuni entre 1545 et 1563, le Concile de Trente réaffirme la doctrine traditionnelle (autorité du pape, sept sacrements, culte de la Vierge et des saints). Pour corriger les dérives, il ordonne la création de séminaires pour mieux former les prêtres, interdit le cumul des richesses ecclésiastiques et s'appuie sur de nouveaux ordres rigoureux comme les Jésuites pour défendre et propager activement le catholicisme." 
+            },
+            { 
+                id: 10, 
+                pergunta: "Qu'est-ce que l'édit de Nantes?", 
+                resposta: "Une loi pacificatrice historique signée par le roi Henri IV en 1598.", 
+                explicacao: "Cet édit royal met fin à plus de trente ans de guerres de religion destructrices en France entre catholiques et protestants (huguenots). Il accorde à ces derniers la liberté de conscience et une liberté de culte relative, ainsi que des places fortes militaires pour leur sécurité. C'est un pas historique vers la tolérance civile en dissociant la religion du citoyen de sa fidélité à l'État." 
+            },
+            { 
+                id: 11, 
+                pergunta: "Quelles sont les différences principales entre la monarchie parlementaire anglaise et la monarchie absolue française à la fin du XVIIIe siècle?", 
+                resposta: "En Angleterre, le pouvoir du souverain est partagé avec le Parlement et limité par la loi, tandis qu'en France, le roi concentre tous les pouvoirs exécutif, législatif et judiciaire.", 
+                explicacao: "Le contraste est total : En Angleterre, depuis le Bill of Rights (1689), le roi ne peut lever d'impôts ni faire de lois sans le Parlement. En France, le modèle de droit divin triomphe : le monarque absolu concentre tous les pouvoirs régaliens sans aucun contre-pouvoir représentatif permanent." 
+            },
+            { 
+                id: 12, 
+                pergunta: "Comment le Roi Soleil a-t-il renforcé l'image de son pouvoir absolu auprès de ses sujets ?", 
+                resposta: "Louis XIV a renforcé son pouvoir absolu en se présentant comme le 'Roi Soleil', en centralisant la noblesse à Versailles et en contrôlant rigoureusement son image.", 
+                explicacao: "Louis XIV utilise Versailles pour domestiquer la haute noblesse à travers une étiquette rigide, éliminant tout risque de rébellion. En choisissant le Soleil comme emblème, il s'associe à l'astre central indispensable à la vie. Les arts, peintures et monuments sont tous mobilisés comme outils de propagande pour graver dans l'esprit de ses sujets la gloire d'un roi puissant choisi directement par Dieu." 
+            },
+            { 
+                id: 13, 
+                pergunta: "À la fin du XVIIIe siècle, en Angleterre, quelles limites les lois imposent-elles au pouvoir du roi?", 
+                resposta: "Les lois constitutionnelles interdisent au roi de gouverner de façon unilatérale, d'imposer de nouvelles taxes ou de suspendre des lois sans l'accord obligatoire du Parlement.", 
+                explicacao: "Protégé par l'Habeas Corpus (contre les arrestations arbitraires) et le Bill of Rights, le citoyen anglais vit sous un régime où le pouvoir royal est encadré. Le roi ne peut modifier les lois, lever des taxes exceptionnelles ou maintenir une armée en temps de paix sans un vote souverain et majoritaire du Parlement." 
+            }
+        ];
+
+        let perguntas = JSON.parse(localStorage.getItem('historia_dados_v5')) || perguntasIniciais.map(p => ({...p, proximaRevisao: 0}));
+        let itemAtual = null;
+        let audioCtx = null;
+
+        function salvar() { localStorage.setItem('historia_dados_v5', JSON.stringify(perguntas)); }
+
+        // NOUVEAUTÉ : Fonction pour forcer l'apparition immédiate d'une question au clic
+        function genererQuestionManuelle() {
+            // Pauser l'audio précédent s'il y en a un
+            document.getElementById('player-audio').pause();
+            
+            // Sélectionne une question aléatoire parmi toutes celles disponibles
+            itemAtual = perguntasIniciais[Math.floor(Math.random() * perguntasIniciais.length)];
+            exibirCard();
+            
+            // Fait défiler l'écran automatiquement vers la carte sur mobile
+            document.getElementById('area-estudo').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function inicializarSistema() {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            Notification.requestPermission().then(perm => {
+                document.getElementById('btn-permitir').classList.add('escondido');
+                document.getElementById('status-msg').classList.remove('escondido');
+                verificarPerguntas();
+                setInterval(verificarPerguntas, 15 * 60 * 1000);
+            });
+        }
+
+        function tocarBip() {
+            if (!audioCtx) return;
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        function verificarPerguntas() {
+            if (itemAtual) return;
+            const agora = Date.now();
+            const disponiveis = perguntas.filter(p => p.proximaRevisao <= agora);
+            if (disponiveis.length > 0) {
+                itemAtual = disponiveis[Math.floor(Math.random() * disponiveis.length)];
+                tocarBip();
+                setTimeout(tocarBip, 400);
+                new Notification("Nouvelle Question d'Histoire !", { body: itemAtual.pergunta, tag: "revisao-historia" });
+                document.title = "⚠️ QUESTION DISPONIBLE !";
+                exibirCard();
+            }
+        }
+
+        function exibirCard() {
+            if (!itemAtual) return;
+            document.getElementById('area-estudo').classList.remove('escondido');
+            document.getElementById('pergunta-texto').innerText = itemAtual.pergunta;
+            document.getElementById('area-resposta').classList.add('escondido');
+            document.getElementById('btn-ver').classList.remove('escondido');
+        }
+
+        function mostrarResposta() {
+            const player = document.getElementById('player-audio');
+            player.src = `${itemAtual.id}.mp3`;
+            document.getElementById('area-resposta').classList.remove('escondido');
+            document.getElementById('btn-ver').classList.add('escondido');
+            document.getElementById('resposta-texto').innerText = itemAtual.resposta;
+            document.getElementById('explicacao-texto').innerText = itemAtual.explicacao;
+            player.play().catch(e => console.log("Attente d'interaction pour l'audio."));
+        }
+
+        function computar(acertou) {
+            document.getElementById('player-audio').pause();
+            const agora = Date.now();
+            perguntas = perguntas.map(p => {
+                if (p.id === itemAtual.id) {
+                    p.proximaRevisao = acertou ? agora : agora + (20 * 60 * 1000);
+                }
+                return p;
+            });
+            salvar();
+            document.getElementById('area-estudo').classList.add('escondido');
+            document.title = "Révision Orale - Histoire";
+            itemAtual = null;
+        }
+    </script>
+</body>
+</html>
